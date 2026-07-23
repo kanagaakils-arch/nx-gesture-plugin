@@ -1,0 +1,10 @@
+{
+  "name": "NX Gesture Interface",
+  "description": "A high-level interface for UG NX that simplifies design and modeling via gesture control using hand tracking.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

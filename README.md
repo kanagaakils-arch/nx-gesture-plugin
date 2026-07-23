@@ -39,17 +39,19 @@ If your office firewall blocks Python from downloading packages:
 
 1. **Start the Gesture Engine**:
    - Double-click `run_server.bat` in the `nx-plugin` folder. 
-   - A webcam feed will appear showing your real-time hand tracking.
+   - A floating "always-on-top" mini-window will appear showing your real-time hand tracking, so it won't get in your way while you work.
 2. **Connect Siemens NX**:
    - Open Siemens NX and load any 3D model.
    - Go to **File > Execute > NX/Open** (or press `Ctrl+U`).
    - Select the `nx_view_controller.py` script from the `nx-plugin` folder.
 3. **Control the Model**:
    - **Rotate:** Make a fist and move your hand (rotates around X and Y axes).
+   - **Roll:** Keep a fist and twist your wrist left or right (rotates around Z axis).
    - **Pan:** Open your hand flat and move it side to side or up and down.
-   - **Zoom:** Pinch your thumb and index finger together, and move your hand towards or away from the screen.
+   - **Zoom:** Pinch your thumb and index finger together, and move your hand vertically.
+   - **Fit View:** Make an "OK" sign (thumb and index pinched, other fingers open) to instantly center the model on screen.
 
 ## Advanced Features
-- **EMA Smoothing**: Hand micro-tremors are filtered out using low-pass exponential smoothing, making camera rotations buttery smooth.
+- **Dynamic EMA Tracking**: When you move your hand quickly, the algorithm switches to zero-latency tracking. When you slow down, it instantly applies heavy Exponential Moving Average smoothing to eliminate all hand jitter for pixel-perfect adjustments.
+- **TopMost Mini Window**: The webcam feed acts as a picture-in-picture overlay so you never lose track of your gesture state without losing screen real estate.
 - **Dynamic Deadzones**: Tiny twitches are ignored, while large, deliberate movements scale exponentially for fast navigation.
-- **3D Depth Estimation**: Zooming relies on calculated Z-depth changes based on the relative size of your hand, ensuring it works consistently regardless of your distance from the webcam.
