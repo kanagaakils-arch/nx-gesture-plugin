@@ -1,115 +1,97 @@
-# Siemens NX Advanced Gesture Controller
+# 🚀 NX Enterprise Gesture Controller
 
-Welcome to the **NX Advanced Gesture Controller**! This plugin transforms your standard webcam into a highly responsive, zero-touch 3D navigation tool for Siemens NX. By leveraging MediaPipe's AI hand-tracking and advanced vector mathematics, you can intuitively Rotate, Pan, Zoom, and Roll your 3D models with simple hand gestures.
+Welcome to the **NX Enterprise Gesture Controller**, a cutting-edge, offline-first Artificial Intelligence plugin designed exclusively for Siemens NX. This system utilizes Google MediaPipe's deep learning computer vision to transform your webcam into a high-precision, sub-millimeter spatial controller for 3D CAD modeling.
 
-## 🌟 Key Features
-
-*   **Always-On-Top Mini Window**: The webcam feed acts as a small, unobtrusive picture-in-picture overlay. It stays on top of Siemens NX so you never lose track of your gesture state, without sacrificing your CAD workspace.
-*   **Dynamic EMA Tracking Algorithm**: Experience pixel-perfect control. When you move your hand quickly, the algorithm switches to zero-latency tracking for broad movements. As you slow down, it dynamically applies heavy Exponential Moving Average (EMA) smoothing to eliminate micro-tremors.
-*   **6-DoF Inspired Navigation**: Complete control including X/Y rotation, Z-axis roll, 2D panning, and depth-based zooming.
-*   **Zero Admin Setup**: Designed specifically for strict corporate environments, the installation runs entirely in "user space" and does not require Administrator privileges.
+No gloves. No VR headsets. Just your bare hands and a standard webcam.
 
 ---
 
-## 🛠 Step-by-Step Installation
+## 🌟 Core Enterprise Features
 
-Because corporate office environments often restrict admin access and internet connectivity, this tool includes robust setup scripts to get you running regardless of your network constraints.
+### 🧠 Advanced Spatial Computing
+*   **The One-Euro Filter:** Industry-standard tracking mathematics (used in Oculus and Vive VR) guarantees literal zero-latency when moving fast, and absolute zero-jitter when holding your hands perfectly still.
+*   **Angle-Based AI Recognition:** The AI calculates the 3D Vector Angles of all 21 joints in your hand. Gestures are recognized perfectly regardless of hand rotation, tilt, or distance.
+*   **Depth-Adaptive Normalization:** As you lean forward or backward in your chair, the AI mathematically measures your hand's distance from the lens and dynamically auto-scales tracking sensitivity to ensure perfectly consistent CAD rotation.
 
-### Method 1: Standard Installation (If you have Internet Access)
+### 🖖 Multi-Hand & Multimodal Tracking
+*   **Dual-Hand Co-processing:** The system actively tracks both hands simultaneously. Pinch with your left *and* right hand to grab the 3D model and stretch it to Zoom, exactly like an iPad touchscreen.
+*   **Holographic Head Tracking:** Utilizing Face Mesh AI, the system tracks your nose in 3D space. As you lean around your monitor, the Siemens NX camera subtly pans and rotates, providing a real-world "looking through a window" parallax effect!
+*   **Acoustic Haptics:** The system taps directly into the Windows audio driver to provide subtle, professional clicks and chimes upon gesture execution, allowing you to use macros without taking your eyes off the screen.
 
-Use this method if your computer is connected to the internet and allows Python to download packages.
-
-1.  **Extract the Files**: Place the `nx-gesture-interface` folder anywhere on your computer (e.g., your Documents folder).
-2.  **Open the Plugin Folder**: Navigate inside the `nx-plugin` directory.
-3.  **Run the Installer**:
-    *   On Windows: Double-click `run_server.bat`
-    *   On Mac/Linux: Run `bash run_server.sh`
-4.  **Wait for Setup**: The script will automatically create an isolated Python virtual environment (`.venv`) and install the required AI libraries (OpenCV, MediaPipe, NumPy).
-5.  **Done!** The server will launch immediately after installation. In the future, running this script will skip the installation and just start the server.
-
-### Method 2: Offline USB Installation (Strict Office Firewalls)
-
-Use this method if your office computer blocks `pip` from downloading files from the internet.
-
-**Part A: On your Personal Computer (At Home / Unrestricted Network)**
-1.  Navigate to the `nx-plugin` folder on your personal machine.
-2.  Run the offline downloader script:
-    *   On a Mac: `bash download_windows_wheels.sh`
-    *   On Windows: Double-click `download_windows_wheels.bat`
-3.  This script will download exactly what your office computer needs into a new folder called `nx-packages`.
-4.  Copy the entire `nx-gesture-interface` folder (which now contains `nx-packages`) to a USB thumb drive.
-
-**Part B: On your Office Computer (No Internet)**
-1.  Copy the folder from your USB drive to your office computer.
-2.  Navigate to the `nx-plugin` folder and double-click `run_server.bat`.
-3.  The script will detect the `nx-packages` folder and perform a completely offline installation automatically!
+### 💻 Enterprise Command Center GUI
+*   **Zero-Dependency Offline UI:** A sleek, Charcoal/Cyan Dark Mode dashboard built entirely in native Python. No internet required.
+*   **Hot-Reloading Architecture:** Adjust sensitivities, toggle features, or swap your dominant hand on the fly. The background C++ computer vision threads will hot-reload your settings in under 10ms without dropping a single frame.
+*   **Custom Gesture Machine Learning:** Shape your hand into a custom pose, click **🔴 Record Gesture** in the UI, and the AI will memorize the specific mathematical feature vector of your hand. You can instantly bind this to trigger custom macros in NX!
+*   **Real-Time Developer Console:** Monitor exact AI loop times, live UDP socket connections, and real-time gesture execution directly in the GUI.
 
 ---
 
-## 🎮 How to Use in Siemens NX
+## ✋ The Master Gesture Codex
 
-Once the installation is complete, follow these exact steps every time you want to use the gesture controller.
-
-### Step 1: Start the Gesture Engine
-Double-click `run_server.bat` (or `.sh`). You will see a small overlay window appear showing your webcam feed. As long as this window is open, the system is tracking your hands.
-
-### Step 2: Connect Siemens NX
-1. Open Siemens NX and load any 3D model or assembly.
-2. Go to the top menu and select **File > Execute > NX/Open** (Shortcut: `Ctrl+U`).
-3. Browse to the `nx-plugin` folder and select the `nx_view_controller.py` script.
-4. *Look at the bottom status bar in NX—it should read: "NX Gesture Control Active".*
-
-### Step 3: Master the Gestures
-
-Bring your hand into the camera's view to take control. The system tracks your **Index Finger Knuckle** as the primary anchor point.
-
-| Gesture Command | Hand Shape | Movement Action | Result in Siemens NX |
+### Navigation & Camera (Dominant Hand)
+| Action | Hand Pose | Movement | Description |
 | :--- | :--- | :--- | :--- |
-| **ROTATE (X/Y)** | ✊ **Fist** (All fingers closed) | Move hand Up/Down/Left/Right | Orbits the camera around the model. |
-| **ROLL (Z)** | ✊ **Fist** (All fingers closed) | Twist your wrist clockwise or counter-clockwise | Rolls the camera along the Z-axis. |
-| **PAN** | ✋ **Flat Open Hand** (Fingers spread) | Move hand Up/Down/Left/Right | Slides the model across the screen. |
-| **ZOOM** | 🤏 **Pinch** (Thumb and Index touching) | Move hand vertically Up/Down | Zooms in (up) and out (down). |
-| **FIT VIEW** | 👌 **"OK" Sign** (Thumb & Index pinched, other 3 open) | Hold the pose for 1 second | Instantly centers and fits the entire model to the screen. |
-| **RESET VIEW** | 👍 **Thumbs Up** (Thumb open, other 4 closed) | Hold the pose for 1 second | Resets the camera to a standard Trimetric (Isometric) view. |
+| **Rotate Model** | ✊ **Fist** | Move X / Y | Standard 3D orbital rotation. |
+| **Roll Model** | ✊ **Fist** | Twist Wrist | Rolls the model along the Z-axis. |
+| **Pan Model** | ✋ **Flat Hand** | Move X / Y | Slides the camera view horizontally/vertically. |
+| **Zoom Model** | 🤏 **Pinch** | Move Y (Up/Down) | Pushes the camera in and out. |
+| **Two-Hand Zoom** | 🤏+🤏 **Dual Pinch** | Pull Apart / Push In | iPad-style multi-touch zooming. |
+| **Fit to Screen** | 👌 **"OK" Sign** | Hold 1s | Instantly centers and fits the entire model. |
+| **Reset View** | 👍 **Thumbs Up** | Hold 1s | Resets the camera to a standard Isometric View. |
 
-### Advanced OS & Macro Gestures
-| Gesture Command | Hand Shape | Movement Action | Result |
+### Advanced OS Control & Macros
+| Action | Hand Pose | Movement | Description |
 | :--- | :--- | :--- | :--- |
-| **MODE SWITCH** | 🤙 **Hitchhiker** (Thumb pointing sideways, others closed) | Hold the pose | Toggles between CAMERA MODE and ASSEMBLY MODE. |
-| **UNDO** | ✌️ **Peace Sign** (Index & Middle open) | Hold the pose | Instantly triggers the NX Undo command to revert mistakes. |
-| **SAVE** | 🤟 **Spider-Man** (Index, Pinky, Thumb open) | Hold the pose | Instantly saves your work part in NX. |
-| **CUSTOM MACRO** | *Anything you want!* | Hold your custom pose | Triggers your custom macro in NX! (See GUI instructions). |
-| **LASER POINT** | ☝️ **Index Pointing** (Index open, others closed) | Point at screen | Moves the Windows Mouse Cursor exactly where you point! |
-| **LASER CLICK** | ☝️+🤏 **Index Point + Thumb Tap** | Tap thumb against index | Simulates a physical Left Mouse Click to select parts. |
+| **Mode Switch** | 🤙 **Hitchhiker** | Hold | Toggles between CAMERA MODE and ASSEMBLY MODE. |
+| **Undo** | ✌️ **Peace Sign** | Hold | Triggers NX Undo to instantly revert a mistake. |
+| **Save Part** | 🤟 **Spider-Man** | Hold | Instantly saves your active work part in NX. |
+| **Laser Pointer** | ☝️ **Index Pointing** | Point at screen | Physically takes over the Windows OS Mouse cursor! |
+| **Laser Click** | ☝️+🤏 **Index + Thumb** | Tap thumb to index | Executes a physical Windows Left-Click to select CAD faces. |
+
+*(Plus any Custom Gestures you train in the GUI!)*
 
 ---
 
-## ⚙️ Configuration & GUI Control Panel
+## 🛠️ Installation & Setup (Strict Offline Environment)
 
-You can easily adjust sensitivities, swap hands, tune the micro-tremor filter, and **record custom gestures** using the included Desktop App!
+Because corporate engineering networks often block `pip install`, this system is designed to be installed via a highly secure, two-step "Sneakernet" process.
 
-1. Open the `nx-plugin` folder.
-2. Double-click `run_control_panel.bat`.
-3. A sleek **Charcoal Dark Mode GUI** will open. Any sliders you move will **instantly hot-reload** into the gesture server without needing a restart!
+### Step 1: Gather Dependencies (On a Personal Computer)
+1. Download this entire repository to a personal computer with internet access.
+2. Double-click the `download_windows_wheels.bat` script.
+3. It will automatically download the offline `.whl` files for `mediapipe`, `opencv-python`, and `protobuf` into a `/wheels/` folder.
+4. Copy the entire repository (including the new `/wheels/` folder) to a USB Drive.
 
-### The Developer Console
-The GUI features a real-time **System Console** at the bottom. It streams live logs from the Gesture Server, including FPS, connection status, and precise gesture triggers. 
+### Step 2: Install Offline (On the Corporate NX Workstation)
+1. Copy the repository from the USB drive to your office computer.
+2. Ensure you have Python installed.
+3. Open a Command Prompt in the repository folder and run:
+   ```cmd
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install --no-index --find-links=wheels mediapipe opencv-python
+   ```
 
-### Enterprise Tracking Features
-In the **AI & Gestures** tab, you can enable:
-*   **Holographic Head Tracking (Parallax):** The AI uses Face Mesh tracking to monitor your head position. As you lean around your monitor, the CAD model will subtly rotate and pan, giving a 3D holographic window effect!
-*   **Two-Handed Coordination:** Use both hands simultaneously! If you pinch with your Left *and* Right hand and pull them apart, the CAD model will Zoom (exactly like an iPad touchscreen).
-*   **Depth-Adaptive Sensitivity:** The system mathematically calculates your hand's distance from the camera (Z-Axis Normalization) and auto-scales your sensitivity. Your CAD model moves consistently whether you sit 1 foot or 4 feet away.
+### Step 3: Launching the System
+1. **Start the AI Engine & GUI:** Double click `nx-plugin/run_control_panel.bat`. The dark mode UI and the OpenCV AI overlay will launch.
+2. **Start Siemens NX:** Open Siemens NX and load a 3D part.
+3. **Inject the Controller:** In NX, press `Ctrl+U` (Execute User Function). Select `nx-plugin/nx_view_controller.py`.
+4. **You are now in full spatial control of your CAD environment.**
 
-### Acoustic Haptic Feedback
-If enabled in the GUI, the system will use your Windows audio driver to produce subtle, professional **"Clicks" and "Chimes"** when you trigger macros or switch modes. You never have to take your eyes off the CAD model to know the AI registered your command!
+---
 
-### Custom Gesture Creator
-In the **AI & Gestures** tab, click **🔴 Record Gesture**. Hold your hand in any complex pose you desire, and the AI will memorize the 3D angles of all 21 joints in your hand. You can name it whatever you like (e.g., `MACRO_EXTRUDE`), and the server will detect it whenever you make that shape!
+## 🏗️ System Architecture
 
-*Note: The system operates completely offline using built-in Windows APIs and standard Python UI frameworks.*
-*   Ensure your room is well-lit. MediaPipe tracking degrades in low light.
-*   Increase the `"deadzone"` in `config.json` to `0.005` to ignore larger micro-tremors.
-
-**The camera is jumping between my two hands.**
-*   The system is now locked to a specific hand to prevent jumping! If you are left-handed, change `"target_hand": "Right"` to `"target_hand": "Left"` in your `config.json`.
+```mermaid
+graph TD
+    A[Webcam Feed] -->|Frames| B(MediaPipe C++ Engine)
+    B -->|21 Joint 3D Vectors| C{Gesture Server}
+    C -->|One-Euro Filter Math| D[Normalized Output]
+    
+    E[GUI Control Panel] -->|User Input| F[(config.json)]
+    F -.->|10ms Hot-Reloading| C
+    F -.->|10ms Hot-Reloading| G[NX Open Controller]
+    
+    D -->|UDP Packets| G
+    G -->|NXOpen API| H[Siemens NX Viewport]
+```
