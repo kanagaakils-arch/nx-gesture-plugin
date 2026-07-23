@@ -90,10 +90,19 @@ You can easily adjust sensitivities, swap hands, tune the micro-tremor filter, a
 
 1. Open the `nx-plugin` folder.
 2. Double-click `run_control_panel.bat`.
-3. A sleek graphical user interface will open. Any sliders you move will **instantly hot-reload** into the gesture server without needing a restart!
+3. A sleek **Charcoal Dark Mode GUI** will open. Any sliders you move will **instantly hot-reload** into the gesture server without needing a restart!
 
-### Holographic Head Tracking (Parallax)
-In the GUI under the **AI & Gestures** tab, you can enable "Parallax Camera". The AI will activate Face Mesh tracking to monitor your head position. As you lean around your monitor, the CAD model will subtly rotate and pan, giving a real-world 3D holographic window effect!
+### The Developer Console
+The GUI features a real-time **System Console** at the bottom. It streams live logs from the Gesture Server, including FPS, connection status, and precise gesture triggers. 
+
+### Enterprise Tracking Features
+In the **AI & Gestures** tab, you can enable:
+*   **Holographic Head Tracking (Parallax):** The AI uses Face Mesh tracking to monitor your head position. As you lean around your monitor, the CAD model will subtly rotate and pan, giving a 3D holographic window effect!
+*   **Two-Handed Coordination:** Use both hands simultaneously! If you pinch with your Left *and* Right hand and pull them apart, the CAD model will Zoom (exactly like an iPad touchscreen).
+*   **Depth-Adaptive Sensitivity:** The system mathematically calculates your hand's distance from the camera (Z-Axis Normalization) and auto-scales your sensitivity. Your CAD model moves consistently whether you sit 1 foot or 4 feet away.
+
+### Acoustic Haptic Feedback
+If enabled in the GUI, the system will use your Windows audio driver to produce subtle, professional **"Clicks" and "Chimes"** when you trigger macros or switch modes. You never have to take your eyes off the CAD model to know the AI registered your command!
 
 ### Custom Gesture Creator
 In the **AI & Gestures** tab, click **🔴 Record Gesture**. Hold your hand in any complex pose you desire, and the AI will memorize the 3D angles of all 21 joints in your hand. You can name it whatever you like (e.g., `MACRO_EXTRUDE`), and the server will detect it whenever you make that shape!

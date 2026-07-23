@@ -6,9 +6,12 @@
   "tracking": {
     "target_hand": "Right",
     "deadzone": 0.002,
-    "smoothing_base_alpha": 0.3,
     "enable_head_tracking": false,
-    "head_tracking_sensitivity": 2.0
+    "two_handed_mode": true,
+    "depth_adaptive": true
+  },
+  "haptics": {
+    "audio_feedback": true
   },
   "sensitivity": {
     "rotate": 3.0,

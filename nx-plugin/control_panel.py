@@ -5,11 +5,13 @@ import os
 import time
 
 CONFIG_FILE = os.path.join(os.path.dirname(__file__), "config.json")
+LOG_FILE = os.path.join(os.path.dirname(__file__), "system_log.txt")
 
 def load_config():
     if not os.path.exists(CONFIG_FILE):
         return {
-            "tracking": {"target_hand": "Right", "deadzone": 0.002, "enable_head_tracking": False},
+            "tracking": {"target_hand": "Right", "deadzone": 0.002, "enable_head_tracking": False, "two_handed_mode": True, "depth_adaptive": True},
+            "haptics": {"audio_feedback": True},
             "sensitivity": {"rotate": 3.0, "pan": 100.0, "zoom": 2.0, "roll": 50.0},
             "custom_gestures": {"record_request": False, "active_gestures": {}}
         }
@@ -24,7 +26,7 @@ class ControlPanel(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("NX Gesture Engine")
-        self.geometry("420x600")
+        self.geometry("450x700")
         self.attributes('-topmost', True)
         
         self.config_data = load_config()
@@ -34,10 +36,10 @@ class ControlPanel(tk.Tk):
         header = tk.Frame(self, bg="#202225", pady=15)
         header.pack(fill='x')
         tk.Label(header, text="NX GESTURE ENGINE", font=("Segoe UI", 16, "bold"), fg="#00ffcc", bg="#202225").pack()
-        tk.Label(header, text="v5.0 Pro Control Panel", font=("Segoe UI", 10), fg="#a8b2b9", bg="#202225").pack()
+        tk.Label(header, text="v6.0 Enterprise Console", font=("Segoe UI", 10), fg="#a8b2b9", bg="#202225").pack()
         
         notebook = ttk.Notebook(self)
-        notebook.pack(expand=True, fill='both', padx=15, pady=15)
+        notebook.pack(expand=True, fill='both', padx=15, pady=10)
         
         # TAB 1: Core Settings
         tab_core = ttk.Frame(notebook)
@@ -49,11 +51,22 @@ class ControlPanel(tk.Tk):
         notebook.add(tab_ai, text='  🤖 AI & Gestures  ')
         self.build_ai_tab(tab_ai)
         
+        # TAB 3: System Console
+        tab_console = ttk.Frame(notebook)
+        notebook.add(tab_console, text='  💻 Dev Console  ')
+        self.build_console_tab(tab_console)
+        
         # Save Button
         save_btn = tk.Button(self, text="⚡ SAVE & HOT-RELOAD", font=("Segoe UI", 11, "bold"), 
                              bg="#00ffcc", fg="#1e1e1e", activebackground="#00ccaa",
                              relief="flat", cursor="hand2", command=self.apply_changes)
-        save_btn.pack(pady=(0, 20), fill='x', padx=30, ipady=8)
+        save_btn.pack(pady=(5, 15), fill='x', padx=30, ipady=8)
+
+        # Clear log file on start
+        with open(LOG_FILE, 'w') as f: f.write("NX Gesture Engine Control Panel Initialized...\n")
+        
+        # Start Console Poller
+        self.after(500, self.update_console)
 
     def apply_dark_theme(self):
         self.configure(bg="#2f3136")
@@ -66,7 +79,7 @@ class ControlPanel(tk.Tk):
         
         style.configure(".", background=bg_color, foreground=fg_color, font=("Segoe UI", 10))
         style.configure("TNotebook", background="#2f3136", borderwidth=0)
-        style.configure("TNotebook.Tab", background="#202225", foreground="#a8b2b9", padding=[15, 8], font=("Segoe UI", 10, "bold"), borderwidth=0)
+        style.configure("TNotebook.Tab", background="#202225", foreground="#a8b2b9", padding=[10, 8], font=("Segoe UI", 10, "bold"), borderwidth=0)
         style.map("TNotebook.Tab", background=[("selected", bg_color)], foreground=[("selected", accent_color)])
         
         style.configure("TFrame", background=bg_color)
@@ -74,7 +87,6 @@ class ControlPanel(tk.Tk):
         style.configure("TScale", background=bg_color, troughcolor="#202225")
         style.configure("TCombobox", fieldbackground="#202225", foreground=fg_color, background=bg_color)
         style.configure("Separator.TSeparator", background="#4f545c")
-        style.configure("Accent.TButton", font=("Segoe UI", 10, "bold"), background=accent_color, foreground="#1e1e1e")
 
     def build_core_tab(self, parent):
         frame = ttk.Frame(parent, padding=20)
@@ -82,18 +94,22 @@ class ControlPanel(tk.Tk):
         
         # Hand Selection
         hand_frame = ttk.Frame(frame)
-        hand_frame.pack(fill='x', pady=(0, 15))
-        ttk.Label(hand_frame, text="Active Hand:", font=("Segoe UI", 11, "bold"), foreground="#00ffcc").pack(side='left')
+        hand_frame.pack(fill='x', pady=(0, 5))
+        ttk.Label(hand_frame, text="Dominant Hand:", font=("Segoe UI", 11, "bold"), foreground="#00ffcc").pack(side='left')
         self.hand_var = tk.StringVar(value=self.config_data["tracking"].get("target_hand", "Right"))
         self.hand_cb = ttk.Combobox(hand_frame, textvariable=self.hand_var, values=["Right", "Left"], state="readonly", width=12)
         self.hand_cb.pack(side='right')
 
-        ttk.Separator(frame, orient='horizontal', style="Separator.TSeparator").pack(fill='x', pady=10)
+        # Audio Haptics
+        self.audio_var = tk.BooleanVar(value=self.config_data.get("haptics", {}).get("audio_feedback", True))
+        ttk.Checkbutton(frame, text="Enable Audio Haptics", variable=self.audio_var).pack(anchor='w', pady=(5, 10))
+
+        ttk.Separator(frame, orient='horizontal', style="Separator.TSeparator").pack(fill='x', pady=5)
         
         ttk.Label(frame, text="Tracking Noise Filter (One-Euro)", font=("Segoe UI", 11, "bold"), foreground="#00ffcc").pack(anchor='w', pady=(5, 0))
         self.deadzone_var = self.create_slider(frame, "Micro-tremor Deadzone", self.config_data["tracking"].get("deadzone", 0.002), 0.0, 0.02, 0.001)
         
-        ttk.Separator(frame, orient='horizontal', style="Separator.TSeparator").pack(fill='x', pady=15)
+        ttk.Separator(frame, orient='horizontal', style="Separator.TSeparator").pack(fill='x', pady=10)
         
         ttk.Label(frame, text="Movement Sensitivities", font=("Segoe UI", 11, "bold"), foreground="#00ffcc").pack(anchor='w', pady=(5, 5))
         self.rot_var = self.create_slider(frame, "Orbit (Rotate)", self.config_data["sensitivity"].get("rotate", 3.0), 0.5, 10.0, 0.5)
@@ -106,11 +122,19 @@ class ControlPanel(tk.Tk):
         frame.pack(fill='both', expand=True)
         
         ttk.Label(frame, text="Holographic Head Tracking", font=("Segoe UI", 11, "bold"), foreground="#00ffcc").pack(anchor='w')
-        ttk.Label(frame, text="Tracks your face to create a 3D parallax effect.", foreground="#a8b2b9").pack(anchor='w', pady=(2, 10))
         self.head_var = tk.BooleanVar(value=self.config_data["tracking"].get("enable_head_tracking", False))
-        ttk.Checkbutton(frame, text="Enable Parallax Mode", variable=self.head_var).pack(anchor='w')
+        ttk.Checkbutton(frame, text="Enable Parallax Mode", variable=self.head_var).pack(anchor='w', pady=(5,10))
         
-        ttk.Separator(frame, orient='horizontal', style="Separator.TSeparator").pack(fill='x', pady=20)
+        ttk.Separator(frame, orient='horizontal', style="Separator.TSeparator").pack(fill='x', pady=15)
+        
+        ttk.Label(frame, text="Spatial Tracking Features", font=("Segoe UI", 11, "bold"), foreground="#00ffcc").pack(anchor='w')
+        self.two_hand_var = tk.BooleanVar(value=self.config_data["tracking"].get("two_handed_mode", True))
+        ttk.Checkbutton(frame, text="Two-Handed Coordination (iPad Zoom)", variable=self.two_hand_var).pack(anchor='w', pady=2)
+        
+        self.depth_var = tk.BooleanVar(value=self.config_data["tracking"].get("depth_adaptive", True))
+        ttk.Checkbutton(frame, text="Depth-Adaptive Sensitivity (Z-Norm)", variable=self.depth_var).pack(anchor='w', pady=(2, 10))
+        
+        ttk.Separator(frame, orient='horizontal', style="Separator.TSeparator").pack(fill='x', pady=15)
         
         ttk.Label(frame, text="Custom Gesture Training", font=("Segoe UI", 11, "bold"), foreground="#00ffcc").pack(anchor='w')
         ttk.Label(frame, text="1. Shape your hand\n2. Click Record\n3. Hold steady for 2 seconds", foreground="#a8b2b9", justify="left").pack(anchor='w', pady=(5, 15))
@@ -120,6 +144,30 @@ class ControlPanel(tk.Tk):
                                relief="flat", cursor="hand2", command=self.record_gesture)
         record_btn.pack(fill='x', ipady=5)
         
+    def build_console_tab(self, parent):
+        frame = ttk.Frame(parent, padding=10)
+        frame.pack(fill='both', expand=True)
+        
+        self.console_text = tk.Text(frame, bg="#1e1e1e", fg="#00ff00", font=("Consolas", 9), wrap="word")
+        self.console_text.pack(fill='both', expand=True)
+        self.console_text.insert("end", "System Console Initialized...\nWaiting for Gesture Server data...\n")
+        self.console_text.config(state="disabled")
+
+    def update_console(self):
+        try:
+            if os.path.exists(LOG_FILE):
+                with open(LOG_FILE, 'r') as f:
+                    lines = f.readlines()
+                if lines:
+                    self.console_text.config(state="normal")
+                    self.console_text.delete(1.0, "end")
+                    self.console_text.insert("end", "".join(lines[-30:]))
+                    self.console_text.see("end")
+                    self.console_text.config(state="disabled")
+        except:
+            pass
+        self.after(500, self.update_console)
+
     def create_slider(self, parent, label_text, default_val, from_, to, resolution):
         frame = ttk.Frame(parent)
         frame.pack(fill='x', pady=4)
@@ -132,7 +180,6 @@ class ControlPanel(tk.Tk):
     def record_gesture(self):
         name = simpledialog.askstring("Name Gesture", "Enter a unique name for this gesture\n(e.g., MACRO_EXTRUDE):")
         if not name: return
-        
         self.config_data["custom_gestures"]["record_request"] = name
         save_config(self.config_data)
         messagebox.showinfo("Recording...", "Hold your hand pose steady in front of the camera for 2 seconds!")
@@ -141,6 +188,11 @@ class ControlPanel(tk.Tk):
         self.config_data["tracking"]["target_hand"] = self.hand_var.get()
         self.config_data["tracking"]["deadzone"] = self.deadzone_var.get()
         self.config_data["tracking"]["enable_head_tracking"] = self.head_var.get()
+        self.config_data["tracking"]["two_handed_mode"] = self.two_hand_var.get()
+        self.config_data["tracking"]["depth_adaptive"] = self.depth_var.get()
+        
+        if "haptics" not in self.config_data: self.config_data["haptics"] = {}
+        self.config_data["haptics"]["audio_feedback"] = self.audio_var.get()
         
         self.config_data["sensitivity"]["rotate"] = self.rot_var.get()
         self.config_data["sensitivity"]["pan"] = self.pan_var.get()
