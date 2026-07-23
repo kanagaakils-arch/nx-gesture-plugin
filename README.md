@@ -72,28 +72,25 @@ Bring your hand into the camera's view to take control. The system tracks your *
 | **FIT VIEW** | 👌 **"OK" Sign** (Thumb & Index pinched, other 3 open) | Hold the pose for 1 second | Instantly centers and fits the entire model to the screen. |
 | **RESET VIEW** | 👍 **Thumbs Up** (Thumb open, other 4 closed) | Hold the pose for 1 second | Resets the camera to a standard Trimetric (Isometric) view. |
 
+### Advanced OS & Macro Gestures
+| Gesture Command | Hand Shape | Movement Action | Result |
+| :--- | :--- | :--- | :--- |
+| **UNDO** | ✌️ **Peace Sign** (Index & Middle open) | Hold the pose | Instantly triggers the NX Undo command to revert mistakes. |
+| **SAVE** | 🤟 **Spider-Man** (Index, Pinky, Thumb open) | Hold the pose | Instantly saves your work part in NX. |
+| **LASER POINT** | ☝️ **Index Pointing** (Index open, others closed) | Point at screen | Moves the Windows Mouse Cursor exactly where you point! |
+| **LASER CLICK** | ☝️+🤏 **Index Point + Thumb Tap** | Tap thumb against index | Simulates a physical Left Mouse Click to select parts. |
+
 ---
 
-## ⚙️ Configuration & Tuning
+## ⚙️ Configuration & GUI Control Panel
 
-You can now tune the system completely without touching code! Simply open the `nx-plugin/config.json` file in any text editor.
+You can easily adjust sensitivities, swap hands, and tune the micro-tremor filter using the included Desktop App!
 
-```json
-{
-  "tracking": {
-    "target_hand": "Right", 
-    "deadzone": 0.002
-  },
-  "sensitivity": {
-    "rotate": 3.0,
-    "pan": 100.0,
-    "zoom": 2.0,
-    "roll": 50.0
-  }
-}
-```
+1. Open the `nx-plugin` folder.
+2. Double-click `run_control_panel.bat`.
+3. A sleek graphical user interface will open. Any sliders you move will **instantly hot-reload** into the gesture server without needing a restart!
 
-**The camera view is jerky.**
+*Note: The system operates completely offline using built-in Windows APIs and standard Python UI frameworks.*
 *   Ensure your room is well-lit. MediaPipe tracking degrades in low light.
 *   Increase the `"deadzone"` in `config.json` to `0.005` to ignore larger micro-tremors.
 

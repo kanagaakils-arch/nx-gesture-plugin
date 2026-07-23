@@ -16,22 +16,26 @@ def main():
         
     work_view = session.Parts.Display.ModelingViews.WorkView
     
-    # Load configuration
     config_file = os.path.join(os.path.dirname(__file__), "config.json")
-    try:
-        with open(config_file, 'r') as f:
-            config = json.load(f)
-    except Exception as e:
-        uf.Ui.SetStatus(f"Error loading config.json: {e}")
+    last_config_mtime = 0
+    
+    def load_config():
+        nonlocal last_config_mtime
+        try:
+            with open(config_file, 'r') as f:
+                config = json.load(f)
+            last_config_mtime = os.path.getmtime(config_file)
+            return config
+        except:
+            return None
+
+    config = load_config()
+    if not config:
+        uf.Ui.SetStatus("Error loading config.json")
         return
 
     UDP_IP = config["network"]["udp_ip"]
     UDP_PORT = config["network"]["udp_port"]
-    
-    ROT_SENSITIVITY = config["sensitivity"]["rotate"]
-    PAN_SENSITIVITY = config["sensitivity"]["pan"]
-    ZOOM_SENSITIVITY = config["sensitivity"]["zoom"]
-    ROLL_SENSITIVITY = config["sensitivity"]["roll"]
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
@@ -42,6 +46,18 @@ def main():
     try:
         while True:
             try:
+                # Hot-reload config
+                if os.path.getmtime(config_file) > last_config_mtime:
+                    new_config = load_config()
+                    if new_config:
+                        config = new_config
+                        uf.Ui.SetStatus("Config Hot-Reloaded in NX!")
+                
+                ROT_SENSITIVITY = config["sensitivity"]["rotate"]
+                PAN_SENSITIVITY = config["sensitivity"]["pan"]
+                ZOOM_SENSITIVITY = config["sensitivity"]["zoom"]
+                ROLL_SENSITIVITY = config["sensitivity"]["roll"]
+
                 data, addr = sock.recvfrom(1024)
                 msg = json.loads(data.decode('utf-8'))
                 
@@ -53,7 +69,22 @@ def main():
                 
                 needs_update = False
                 
-                if gesture == "RESET_VIEW":
+                if gesture == "MACRO_UNDO":
+                    try:
+                        # Attempt to undo
+                        uf.Ui.SetStatus("Gesture Macro: UNDO triggered")
+                        session.UndoToLastVisibleMark()
+                    except Exception as e:
+                        pass
+                
+                elif gesture == "MACRO_SAVE":
+                    try:
+                        uf.Ui.SetStatus("Gesture Macro: SAVE triggered")
+                        work_part.Save(NXOpen.BasePart.SaveComponents.True, NXOpen.BasePart.CloseAfterSave.False)
+                    except Exception as e:
+                        pass
+                
+                elif gesture == "RESET_VIEW":
                     work_view.Orient(NXOpen.View.ExtendedViewType.Trimetric)
                     work_view.Fit()
                     needs_update = True
