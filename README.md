@@ -75,8 +75,10 @@ Bring your hand into the camera's view to take control. The system tracks your *
 ### Advanced OS & Macro Gestures
 | Gesture Command | Hand Shape | Movement Action | Result |
 | :--- | :--- | :--- | :--- |
+| **MODE SWITCH** | 🤙 **Hitchhiker** (Thumb pointing sideways, others closed) | Hold the pose | Toggles between CAMERA MODE and ASSEMBLY MODE. |
 | **UNDO** | ✌️ **Peace Sign** (Index & Middle open) | Hold the pose | Instantly triggers the NX Undo command to revert mistakes. |
 | **SAVE** | 🤟 **Spider-Man** (Index, Pinky, Thumb open) | Hold the pose | Instantly saves your work part in NX. |
+| **CUSTOM MACRO** | *Anything you want!* | Hold your custom pose | Triggers your custom macro in NX! (See GUI instructions). |
 | **LASER POINT** | ☝️ **Index Pointing** (Index open, others closed) | Point at screen | Moves the Windows Mouse Cursor exactly where you point! |
 | **LASER CLICK** | ☝️+🤏 **Index Point + Thumb Tap** | Tap thumb against index | Simulates a physical Left Mouse Click to select parts. |
 
@@ -84,11 +86,17 @@ Bring your hand into the camera's view to take control. The system tracks your *
 
 ## ⚙️ Configuration & GUI Control Panel
 
-You can easily adjust sensitivities, swap hands, and tune the micro-tremor filter using the included Desktop App!
+You can easily adjust sensitivities, swap hands, tune the micro-tremor filter, and **record custom gestures** using the included Desktop App!
 
 1. Open the `nx-plugin` folder.
 2. Double-click `run_control_panel.bat`.
 3. A sleek graphical user interface will open. Any sliders you move will **instantly hot-reload** into the gesture server without needing a restart!
+
+### Holographic Head Tracking (Parallax)
+In the GUI under the **AI & Gestures** tab, you can enable "Parallax Camera". The AI will activate Face Mesh tracking to monitor your head position. As you lean around your monitor, the CAD model will subtly rotate and pan, giving a real-world 3D holographic window effect!
+
+### Custom Gesture Creator
+In the **AI & Gestures** tab, click **🔴 Record Gesture**. Hold your hand in any complex pose you desire, and the AI will memorize the 3D angles of all 21 joints in your hand. You can name it whatever you like (e.g., `MACRO_EXTRUDE`), and the server will detect it whenever you make that shape!
 
 *Note: The system operates completely offline using built-in Windows APIs and standard Python UI frameworks.*
 *   Ensure your room is well-lit. MediaPipe tracking degrades in low light.

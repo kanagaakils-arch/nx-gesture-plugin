@@ -41,12 +41,11 @@ def main():
     sock.bind((UDP_IP, UDP_PORT))
     sock.setblocking(False)
     
-    uf.Ui.SetStatus(f"NX Gesture Control Active. Listening on port {UDP_PORT}...")
+    uf.Ui.SetStatus(f"NX Enterprise Controller Active. Listening on port {UDP_PORT}...")
 
     try:
         while True:
             try:
-                # Hot-reload config
                 if os.path.getmtime(config_file) > last_config_mtime:
                     new_config = load_config()
                     if new_config:
@@ -66,23 +65,37 @@ def main():
                 dy = msg.get("dy", 0.0)
                 dz = msg.get("dz", 0.0)
                 droll = msg.get("droll", 0.0)
+                assembly_mode = msg.get("assembly_mode", False)
                 
                 needs_update = False
                 
-                if gesture == "MACRO_UNDO":
-                    try:
-                        # Attempt to undo
+                if gesture == "MODE_SWITCH":
+                    mode_str = "ASSEMBLY MODE ON" if assembly_mode else "CAMERA MODE ON"
+                    uf.Ui.SetStatus(f"Gesture Trigger: {mode_str}")
+                    continue
+
+                if gesture == "HEAD_TRACK":
+                    # Parallax effect: Slight Pan and Rotate
+                    if abs(dx) > 0.001 or abs(dy) > 0.001:
+                        uf.View.Pan(work_view.Name, -dx * PAN_SENSITIVITY * 0.1, -dy * PAN_SENSITIVITY * 0.1)
+                        center = work_view.AbsoluteOrigin
+                        axis_y = NXOpen.Vector3d(0.0, 1.0, 0.0)
+                        work_view.Concatenate(1.0, center, axis_y, dx * ROT_SENSITIVITY * 0.5)
+                        axis_x = NXOpen.Vector3d(1.0, 0.0, 0.0)
+                        work_view.Concatenate(1.0, center, axis_x, dy * ROT_SENSITIVITY * 0.5)
+                        needs_update = True
+                        
+                elif gesture.startswith("MACRO_"):
+                    if gesture == "MACRO_UNDO":
                         uf.Ui.SetStatus("Gesture Macro: UNDO triggered")
-                        session.UndoToLastVisibleMark()
-                    except Exception as e:
-                        pass
-                
-                elif gesture == "MACRO_SAVE":
-                    try:
+                        try: session.UndoToLastVisibleMark()
+                        except: pass
+                    elif gesture == "MACRO_SAVE":
                         uf.Ui.SetStatus("Gesture Macro: SAVE triggered")
-                        work_part.Save(NXOpen.BasePart.SaveComponents.True, NXOpen.BasePart.CloseAfterSave.False)
-                    except Exception as e:
-                        pass
+                        try: work_part.Save(NXOpen.BasePart.SaveComponents.True, NXOpen.BasePart.CloseAfterSave.False)
+                        except: pass
+                    else:
+                        uf.Ui.SetStatus(f"Custom Gesture Triggered: {gesture}")
                 
                 elif gesture == "RESET_VIEW":
                     work_view.Orient(NXOpen.View.ExtendedViewType.Trimetric)
@@ -94,38 +107,48 @@ def main():
                     needs_update = True
                     
                 elif gesture == "ROTATE":
-                    center = work_view.AbsoluteOrigin
-                    if abs(dx) > 0.001:
-                        axis_y = NXOpen.Vector3d(0.0, 1.0, 0.0)
-                        angle_y = dx * ROT_SENSITIVITY
-                        work_view.Concatenate(1.0, center, axis_y, angle_y)
-                        needs_update = True
-                    if abs(dy) > 0.001:
-                        axis_x = NXOpen.Vector3d(1.0, 0.0, 0.0)
-                        angle_x = dy * ROT_SENSITIVITY
-                        work_view.Concatenate(1.0, center, axis_x, angle_x)
-                        needs_update = True
+                    if assembly_mode:
+                        uf.Ui.SetStatus(f"Assembly Mode: Rotating Component (dx={dx:.2f}, dy={dy:.2f})")
+                        # Placeholder for complex assembly rotation builder
+                    else:
+                        center = work_view.AbsoluteOrigin
+                        if abs(dx) > 0.001:
+                            axis_y = NXOpen.Vector3d(0.0, 1.0, 0.0)
+                            work_view.Concatenate(1.0, center, axis_y, dx * ROT_SENSITIVITY)
+                            needs_update = True
+                        if abs(dy) > 0.001:
+                            axis_x = NXOpen.Vector3d(1.0, 0.0, 0.0)
+                            work_view.Concatenate(1.0, center, axis_x, dy * ROT_SENSITIVITY)
+                            needs_update = True
                         
                 elif gesture == "ROLL":
-                    if abs(droll) > 0.001:
-                        center = work_view.AbsoluteOrigin
-                        axis_z = NXOpen.Vector3d(0.0, 0.0, 1.0)
-                        angle_z = droll * ROLL_SENSITIVITY
-                        work_view.Concatenate(1.0, center, axis_z, angle_z)
-                        needs_update = True
+                    if assembly_mode:
+                        uf.Ui.SetStatus(f"Assembly Mode: Rolling Component (droll={droll:.2f})")
+                    else:
+                        if abs(droll) > 0.001:
+                            center = work_view.AbsoluteOrigin
+                            axis_z = NXOpen.Vector3d(0.0, 0.0, 1.0)
+                            work_view.Concatenate(1.0, center, axis_z, droll * ROLL_SENSITIVITY)
+                            needs_update = True
                         
                 elif gesture == "PAN":
-                    if abs(dx) > 0.001 or abs(dy) > 0.001:
-                        uf.View.Pan(work_view.Name, -dx * PAN_SENSITIVITY, -dy * PAN_SENSITIVITY)
-                        needs_update = True
+                    if assembly_mode:
+                        uf.Ui.SetStatus(f"Assembly Mode: Moving Component (dx={dx:.2f}, dy={dy:.2f})")
+                    else:
+                        if abs(dx) > 0.001 or abs(dy) > 0.001:
+                            uf.View.Pan(work_view.Name, -dx * PAN_SENSITIVITY, -dy * PAN_SENSITIVITY)
+                            needs_update = True
                         
                 elif gesture == "ZOOM":
-                    if abs(dz) > 0.001:
-                        scale = 1.0 + (dz * ZOOM_SENSITIVITY)
-                        if scale > 0.1:
-                            axis_z = NXOpen.Vector3d(0.0, 0.0, 1.0)
-                            work_view.Concatenate(scale, work_view.AbsoluteOrigin, axis_z, 0.0)
-                            needs_update = True
+                    if assembly_mode:
+                        pass
+                    else:
+                        if abs(dz) > 0.001:
+                            scale = 1.0 + (dz * ZOOM_SENSITIVITY)
+                            if scale > 0.1:
+                                axis_z = NXOpen.Vector3d(0.0, 0.0, 1.0)
+                                work_view.Concatenate(scale, work_view.AbsoluteOrigin, axis_z, 0.0)
+                                needs_update = True
                 
                 if needs_update:
                     uf.Disp.RegenerateDisplay()

@@ -6,12 +6,18 @@
   "tracking": {
     "target_hand": "Right",
     "deadzone": 0.002,
-    "smoothing_base_alpha": 0.3
+    "smoothing_base_alpha": 0.3,
+    "enable_head_tracking": false,
+    "head_tracking_sensitivity": 2.0
   },
   "sensitivity": {
     "rotate": 3.0,
     "pan": 100.0,
     "zoom": 2.0,
     "roll": 50.0
+  },
+  "custom_gestures": {
+    "record_request": false,
+    "active_gestures": {}
   }
 }
