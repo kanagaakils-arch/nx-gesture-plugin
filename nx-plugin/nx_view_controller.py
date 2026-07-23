@@ -3,6 +3,7 @@ import NXOpen.UF
 import socket
 import json
 import time
+import os
 
 def main():
     session = NXOpen.Session.GetSession()
@@ -15,19 +16,28 @@ def main():
         
     work_view = session.Parts.Display.ModelingViews.WorkView
     
-    UDP_IP = "127.0.0.1"
-    UDP_PORT = 5005
+    # Load configuration
+    config_file = os.path.join(os.path.dirname(__file__), "config.json")
+    try:
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+    except Exception as e:
+        uf.Ui.SetStatus(f"Error loading config.json: {e}")
+        return
+
+    UDP_IP = config["network"]["udp_ip"]
+    UDP_PORT = config["network"]["udp_port"]
+    
+    ROT_SENSITIVITY = config["sensitivity"]["rotate"]
+    PAN_SENSITIVITY = config["sensitivity"]["pan"]
+    ZOOM_SENSITIVITY = config["sensitivity"]["zoom"]
+    ROLL_SENSITIVITY = config["sensitivity"]["roll"]
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
     sock.setblocking(False)
     
-    uf.Ui.SetStatus("NX Gesture Control Active. Listening on port 5005...")
-    
-    ROT_SENSITIVITY = 3.0   
-    PAN_SENSITIVITY = 100.0 
-    ZOOM_SENSITIVITY = 2.0  
-    ROLL_SENSITIVITY = 50.0
+    uf.Ui.SetStatus(f"NX Gesture Control Active. Listening on port {UDP_PORT}...")
 
     try:
         while True:
@@ -43,7 +53,12 @@ def main():
                 
                 needs_update = False
                 
-                if gesture == "FIT":
+                if gesture == "RESET_VIEW":
+                    work_view.Orient(NXOpen.View.ExtendedViewType.Trimetric)
+                    work_view.Fit()
+                    needs_update = True
+                    
+                elif gesture == "FIT":
                     work_view.Fit()
                     needs_update = True
                     

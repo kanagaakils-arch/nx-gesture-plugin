@@ -1,0 +1,17 @@
+{
+  "network": {
+    "udp_ip": "127.0.0.1",
+    "udp_port": 5005
+  },
+  "tracking": {
+    "target_hand": "Right",
+    "deadzone": 0.002,
+    "smoothing_base_alpha": 0.3
+  },
+  "sensitivity": {
+    "rotate": 3.0,
+    "pan": 100.0,
+    "zoom": 2.0,
+    "roll": 50.0
+  }
+}

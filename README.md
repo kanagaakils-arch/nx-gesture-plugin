@@ -70,19 +70,32 @@ Bring your hand into the camera's view to take control. The system tracks your *
 | **PAN** | ✋ **Flat Open Hand** (Fingers spread) | Move hand Up/Down/Left/Right | Slides the model across the screen. |
 | **ZOOM** | 🤏 **Pinch** (Thumb and Index touching) | Move hand vertically Up/Down | Zooms in (up) and out (down). |
 | **FIT VIEW** | 👌 **"OK" Sign** (Thumb & Index pinched, other 3 open) | Hold the pose for 1 second | Instantly centers and fits the entire model to the screen. |
+| **RESET VIEW** | 👍 **Thumbs Up** (Thumb open, other 4 closed) | Hold the pose for 1 second | Resets the camera to a standard Trimetric (Isometric) view. |
 
 ---
 
-## ⚙️ Troubleshooting & Tuning
+## ⚙️ Configuration & Tuning
 
-**The camera window is open, but NX isn't responding.**
-*   Ensure that you executed `nx_view_controller.py` *after* starting the server.
-*   Make sure you have an active 3D part open in the NX workspace.
+You can now tune the system completely without touching code! Simply open the `nx-plugin/config.json` file in any text editor.
 
-**The movements are too fast/too slow.**
-*   You can tune the sensitivities by opening `nx_view_controller.py` in Notepad.
-*   Look for `ROT_SENSITIVITY`, `PAN_SENSITIVITY`, `ZOOM_SENSITIVITY`, and `ROLL_SENSITIVITY` near the top of the file and adjust the numbers to your liking.
+```json
+{
+  "tracking": {
+    "target_hand": "Right", 
+    "deadzone": 0.002
+  },
+  "sensitivity": {
+    "rotate": 3.0,
+    "pan": 100.0,
+    "zoom": 2.0,
+    "roll": 50.0
+  }
+}
+```
 
 **The camera view is jerky.**
 *   Ensure your room is well-lit. MediaPipe tracking degrades in low light.
-*   The system uses a `DEADZONE` parameter inside `gesture_server.py`. If your hand shakes naturally, you can increase `DEADZONE = 0.002` to `0.005` to ignore larger micro-tremors.
+*   Increase the `"deadzone"` in `config.json` to `0.005` to ignore larger micro-tremors.
+
+**The camera is jumping between my two hands.**
+*   The system is now locked to a specific hand to prevent jumping! If you are left-handed, change `"target_hand": "Right"` to `"target_hand": "Left"` in your `config.json`.
