@@ -1,57 +1,88 @@
 # Siemens NX Advanced Gesture Controller
 
-This repository contains an advanced gesture-control interface designed specifically for Siemens NX. It allows you to manipulate 3D models in the NX viewport (Pan, Zoom, and Rotate) entirely through hand gestures captured by your webcam.
+Welcome to the **NX Advanced Gesture Controller**! This plugin transforms your standard webcam into a highly responsive, zero-touch 3D navigation tool for Siemens NX. By leveraging MediaPipe's AI hand-tracking and advanced vector mathematics, you can intuitively Rotate, Pan, Zoom, and Roll your 3D models with simple hand gestures.
 
-## Architecture
+## 🌟 Key Features
 
-The system operates in two parts to prevent UI locking and ensure smooth performance inside Siemens NX:
-1. **Gesture Server (`nx-plugin/gesture_server.py`)**: A standalone Python daemon running OpenCV and MediaPipe. It tracks your hands in real-time, calculates 3D vector movements, applies Exponential Moving Average (EMA) smoothing, and broadcasts the data over a local UDP socket.
-2. **NX View Controller (`nx-plugin/nx_view_controller.py`)**: An NX Open Python script that runs inside Siemens NX. It listens to the UDP socket and applies the smoothed transformations directly to the active Work View.
-
----
-
-## 🚀 Setup & Installation (Windows)
-
-Because corporate office environments often restrict admin access and internet connectivity, this tool is designed to run in **User Space** with completely offline installation support.
-
-### Option A: Standard Installation (With Internet)
-If your computer has internet access, simply double-click the included launch script:
-```cmd
-cd nx-plugin
-run_server.bat
-```
-*This will automatically create an isolated Python virtual environment (`.venv`) and safely install all required dependencies (OpenCV, MediaPipe, NumPy) without requiring Administrator privileges.*
-
-### Option B: Offline Installation (No Internet)
-If your office firewall blocks Python from downloading packages:
-1. On a **personal computer with internet**, navigate to the `nx-plugin` folder and run the download script:
-   ```cmd
-   download_windows_wheels.bat
-   ```
-   *(If you are on a Mac, run `./download_windows_wheels.sh` instead).*
-2. This will securely download all required Windows dependencies into a folder called `nx-packages`.
-3. Copy the entire `nx-gesture-interface` folder to a USB drive and transfer it to your offline office computer.
-4. On your office computer, run `run_server.bat`. It will detect the `nx-packages` folder and perform a fully offline installation!
+*   **Always-On-Top Mini Window**: The webcam feed acts as a small, unobtrusive picture-in-picture overlay. It stays on top of Siemens NX so you never lose track of your gesture state, without sacrificing your CAD workspace.
+*   **Dynamic EMA Tracking Algorithm**: Experience pixel-perfect control. When you move your hand quickly, the algorithm switches to zero-latency tracking for broad movements. As you slow down, it dynamically applies heavy Exponential Moving Average (EMA) smoothing to eliminate micro-tremors.
+*   **6-DoF Inspired Navigation**: Complete control including X/Y rotation, Z-axis roll, 2D panning, and depth-based zooming.
+*   **Zero Admin Setup**: Designed specifically for strict corporate environments, the installation runs entirely in "user space" and does not require Administrator privileges.
 
 ---
 
-## ✋ How to Use
+## 🛠 Step-by-Step Installation
 
-1. **Start the Gesture Engine**:
-   - Double-click `run_server.bat` in the `nx-plugin` folder. 
-   - A floating "always-on-top" mini-window will appear showing your real-time hand tracking, so it won't get in your way while you work.
-2. **Connect Siemens NX**:
-   - Open Siemens NX and load any 3D model.
-   - Go to **File > Execute > NX/Open** (or press `Ctrl+U`).
-   - Select the `nx_view_controller.py` script from the `nx-plugin` folder.
-3. **Control the Model**:
-   - **Rotate:** Make a fist and move your hand (rotates around X and Y axes).
-   - **Roll:** Keep a fist and twist your wrist left or right (rotates around Z axis).
-   - **Pan:** Open your hand flat and move it side to side or up and down.
-   - **Zoom:** Pinch your thumb and index finger together, and move your hand vertically.
-   - **Fit View:** Make an "OK" sign (thumb and index pinched, other fingers open) to instantly center the model on screen.
+Because corporate office environments often restrict admin access and internet connectivity, this tool includes robust setup scripts to get you running regardless of your network constraints.
 
-## Advanced Features
-- **Dynamic EMA Tracking**: When you move your hand quickly, the algorithm switches to zero-latency tracking. When you slow down, it instantly applies heavy Exponential Moving Average smoothing to eliminate all hand jitter for pixel-perfect adjustments.
-- **TopMost Mini Window**: The webcam feed acts as a picture-in-picture overlay so you never lose track of your gesture state without losing screen real estate.
-- **Dynamic Deadzones**: Tiny twitches are ignored, while large, deliberate movements scale exponentially for fast navigation.
+### Method 1: Standard Installation (If you have Internet Access)
+
+Use this method if your computer is connected to the internet and allows Python to download packages.
+
+1.  **Extract the Files**: Place the `nx-gesture-interface` folder anywhere on your computer (e.g., your Documents folder).
+2.  **Open the Plugin Folder**: Navigate inside the `nx-plugin` directory.
+3.  **Run the Installer**:
+    *   On Windows: Double-click `run_server.bat`
+    *   On Mac/Linux: Run `bash run_server.sh`
+4.  **Wait for Setup**: The script will automatically create an isolated Python virtual environment (`.venv`) and install the required AI libraries (OpenCV, MediaPipe, NumPy).
+5.  **Done!** The server will launch immediately after installation. In the future, running this script will skip the installation and just start the server.
+
+### Method 2: Offline USB Installation (Strict Office Firewalls)
+
+Use this method if your office computer blocks `pip` from downloading files from the internet.
+
+**Part A: On your Personal Computer (At Home / Unrestricted Network)**
+1.  Navigate to the `nx-plugin` folder on your personal machine.
+2.  Run the offline downloader script:
+    *   On a Mac: `bash download_windows_wheels.sh`
+    *   On Windows: Double-click `download_windows_wheels.bat`
+3.  This script will download exactly what your office computer needs into a new folder called `nx-packages`.
+4.  Copy the entire `nx-gesture-interface` folder (which now contains `nx-packages`) to a USB thumb drive.
+
+**Part B: On your Office Computer (No Internet)**
+1.  Copy the folder from your USB drive to your office computer.
+2.  Navigate to the `nx-plugin` folder and double-click `run_server.bat`.
+3.  The script will detect the `nx-packages` folder and perform a completely offline installation automatically!
+
+---
+
+## 🎮 How to Use in Siemens NX
+
+Once the installation is complete, follow these exact steps every time you want to use the gesture controller.
+
+### Step 1: Start the Gesture Engine
+Double-click `run_server.bat` (or `.sh`). You will see a small overlay window appear showing your webcam feed. As long as this window is open, the system is tracking your hands.
+
+### Step 2: Connect Siemens NX
+1. Open Siemens NX and load any 3D model or assembly.
+2. Go to the top menu and select **File > Execute > NX/Open** (Shortcut: `Ctrl+U`).
+3. Browse to the `nx-plugin` folder and select the `nx_view_controller.py` script.
+4. *Look at the bottom status bar in NX—it should read: "NX Gesture Control Active".*
+
+### Step 3: Master the Gestures
+
+Bring your hand into the camera's view to take control. The system tracks your **Index Finger Knuckle** as the primary anchor point.
+
+| Gesture Command | Hand Shape | Movement Action | Result in Siemens NX |
+| :--- | :--- | :--- | :--- |
+| **ROTATE (X/Y)** | ✊ **Fist** (All fingers closed) | Move hand Up/Down/Left/Right | Orbits the camera around the model. |
+| **ROLL (Z)** | ✊ **Fist** (All fingers closed) | Twist your wrist clockwise or counter-clockwise | Rolls the camera along the Z-axis. |
+| **PAN** | ✋ **Flat Open Hand** (Fingers spread) | Move hand Up/Down/Left/Right | Slides the model across the screen. |
+| **ZOOM** | 🤏 **Pinch** (Thumb and Index touching) | Move hand vertically Up/Down | Zooms in (up) and out (down). |
+| **FIT VIEW** | 👌 **"OK" Sign** (Thumb & Index pinched, other 3 open) | Hold the pose for 1 second | Instantly centers and fits the entire model to the screen. |
+
+---
+
+## ⚙️ Troubleshooting & Tuning
+
+**The camera window is open, but NX isn't responding.**
+*   Ensure that you executed `nx_view_controller.py` *after* starting the server.
+*   Make sure you have an active 3D part open in the NX workspace.
+
+**The movements are too fast/too slow.**
+*   You can tune the sensitivities by opening `nx_view_controller.py` in Notepad.
+*   Look for `ROT_SENSITIVITY`, `PAN_SENSITIVITY`, `ZOOM_SENSITIVITY`, and `ROLL_SENSITIVITY` near the top of the file and adjust the numbers to your liking.
+
+**The camera view is jerky.**
+*   Ensure your room is well-lit. MediaPipe tracking degrades in low light.
+*   The system uses a `DEADZONE` parameter inside `gesture_server.py`. If your hand shakes naturally, you can increase `DEADZONE = 0.002` to `0.005` to ignore larger micro-tremors.
